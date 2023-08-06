@@ -1,3 +1,9 @@
 {% extends 'base.html' %} {% block content %}
-<h1>{% block title %} Welcome to BetterReads! {% endblock %}</h1>
-{% endblock %}
+<h1>{% block title %} Welcome to FlaskBlog {% endblock %}</h1>
+{% for review in reviews %}
+<a href="#">
+  <h2>{{ review['title'] }}</h2>
+</a>
+<span class="badge badge-primary">{{ review['created'] }}</span>
+<hr />
+{% endfor %} {% endblock %}
