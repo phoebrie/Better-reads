@@ -48,3 +48,33 @@ def create():
             return redirect(url_for('index'))
     
     return render_template('create.html')
+
+@app.route('/<int:id>/edit', methods=('GET', 'POST'))
+def edit(id):
+    review = get_review(id)
+
+    if request.method == 'POST':
+        title = request.form['title']
+        author = request.form['author']
+        rating = request.form['rating']
+        content = request.form['content']
+
+        if not title:
+            flash('Title is required!')
+        else:
+            conn = get_db_connection()
+            conn.execute('UPDATE reviews SET title = ?, author = ?, rating = ?, content = ?' 'WHERE id = ?', (title, author, rating, content, id))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('index'))
+    return render_template('edit.html', review=review)
+
+@app.route('/<int:id>/delete', methods=('POST',))
+def delete(id):
+    review = get_review(id)
+    conn = get_db_connection()
+    conn.execute('DELETE FROM REVIEWS WHERE id = ?', (id))
+    conn.commit()
+    conn.close()
+    flash('Your review of "{}" was successfully deleted!'.format(review['title']))
+    return redirect(url_for('index'))
