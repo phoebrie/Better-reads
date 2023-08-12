@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for, flash, redirect
 from werkzeug.exceptions import abort
 
 def get_db_connection():
@@ -16,6 +16,7 @@ def get_review(review_id):
     return review
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'bn?cxghaz;z07A6eu'
 
 
 @app.route('/')
@@ -29,3 +30,21 @@ def index():
 def review(review_id):
     review = get_review(review_id)
     return render_template('review.html', review=review)
+
+@app.route('/create', methods=('GET', 'POST'))
+def create():
+    if request.method == 'POST':
+        title = request.form['title']
+        author = request.form['author']
+        rating = request.form['rating']
+        content = request.form['content']
+        if not title:
+            flash('Title is required!')
+        else:
+            conn = get_db_connection()
+            conn.execute('INSERT INTO reviews (title, author, rating, content) VALUES (?,?,?,?)', (title, author, rating, content))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('index'))
+    
+    return render_template('create.html')
